@@ -3,12 +3,13 @@ import { Component, useContext } from 'react';
 import Carousel from '../components/Carousel';
 import ThemeContext from '../components/ThemeContext';
 import ErrorBoundary from '../components/ErrorBoundary';
+import Modal from '../components/Modal';
 
 class Details extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { loading: true };
+    this.state = { loading: true, showModal: false };
   }
 
   async componentDidMount() {
@@ -20,12 +21,14 @@ class Details extends Component {
     this.setState({ loading: false, ...json.pets[0] });
   }
 
+  toggleModal = () => this.setState({ showModal: !this.state.showModal });
+
   render() {
     if (this.state.loading) {
       return <h2>Loading ...</h2>;
     }
 
-    const { name, animal, breed, city, state, description, images } =
+    const { name, animal, breed, city, state, description, images, showModal } =
       this.state;
 
     return (
@@ -36,12 +39,30 @@ class Details extends Component {
           <h2>
             {animal} - {breed} - {city}, {state}
           </h2>
-          {/* <ThemeContext.Consumer>
-            {([theme]) => <button style={{ backgroundColor: theme }}></button>}
-          </ThemeContext.Consumer> */}
+          <ThemeContext.Consumer>
+            {([theme]) => (
+              <button
+                style={{ backgroundColor: theme }}
+                onClick={this.toggleModal}
+              >
+                Adopt {name}
+              </button>
+            )}
+          </ThemeContext.Consumer>
 
-          <button>Adopt {name}</button>
           <p>{description}</p>
+
+          {showModal ? (
+            <Modal>
+              <div>
+                <h1>Would you like to adopt {name}?</h1>
+                <div className="buttons">
+                  <a href="https://bit.ly/pet-adopt">Yes</a>
+                  <button onClick={this.toggleModal}>No</button>
+                </div>
+              </div>
+            </Modal>
+          ) : null}
         </div>
       </div>
     );
